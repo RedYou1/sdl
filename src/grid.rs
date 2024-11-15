@@ -27,6 +27,43 @@ pub trait GridChildren<T> {
     fn grid_draw(&self, canvas: &mut Canvas<Window>, parent: &T) -> Result<(), String>;
 }
 
+impl<T, K: UserControl> GridChildren<T> for K {
+    fn grid_init(&mut self, canvas: &mut Canvas<Window>, _: &mut T) -> Result<(), String> {
+        self.init(canvas)
+    }
+
+    fn grid_init_frame(
+        &mut self,
+        canvas: &mut Canvas<Window>,
+        surface: FRect,
+        _: &mut T,
+    ) -> Result<(), String> {
+        self.init_frame(canvas, surface)
+    }
+
+    fn grid_event(
+        &mut self,
+        canvas: &mut Canvas<Window>,
+        event: Event,
+        _: &mut T,
+    ) -> Result<(), String> {
+        self.event(canvas, event)
+    }
+
+    fn grid_update(
+        &mut self,
+        canvas: &mut Canvas<Window>,
+        elapsed: Duration,
+        _: &mut T,
+    ) -> Result<(), String> {
+        self.update(canvas, elapsed)
+    }
+
+    fn grid_draw(&self, canvas: &mut Canvas<Window>, _: &T) -> Result<(), String> {
+        self.draw(canvas)
+    }
+}
+
 #[derive(Debug)]
 pub enum ColType {
     Px(f32),
@@ -177,7 +214,11 @@ impl<T> UserControl for Grid<T> {
             let remain_height = surface.height() - self.static_y;
             if remain_width < 0. || remain_height < 0. {
                 return Err(format!(
-                    "Not enough space: requested {}x{} in a grid of {}x{}",self.static_x,self.static_y,surface.width(),surface.height()
+                    "Not enough space: requested {}x{} in a grid of {}x{}",
+                    self.static_x,
+                    self.static_y,
+                    surface.width(),
+                    surface.height()
                 ));
             }
 
@@ -231,43 +272,6 @@ impl<T> UserControl for Grid<T> {
     }
 }
 
-impl<K, V> GridChildren<K> for Grid<V> {
-    fn grid_init(&mut self, canvas: &mut Canvas<Window>, _: &mut K) -> Result<(), String> {
-        self.init(canvas)
-    }
-
-    fn grid_init_frame(
-        &mut self,
-        canvas: &mut Canvas<Window>,
-        surface: FRect,
-        _: &mut K,
-    ) -> Result<(), String> {
-        self.init_frame(canvas, surface)
-    }
-
-    fn grid_event(
-        &mut self,
-        canvas: &mut Canvas<Window>,
-        event: Event,
-        _: &mut K,
-    ) -> Result<(), String> {
-        self.event(canvas, event)
-    }
-
-    fn grid_update(
-        &mut self,
-        canvas: &mut Canvas<Window>,
-        elapsed: Duration,
-        _: &mut K,
-    ) -> Result<(), String> {
-        self.update(canvas, elapsed)
-    }
-
-    fn grid_draw(&self, canvas: &mut Canvas<Window>, _: &K) -> Result<(), String> {
-        self.draw(canvas)
-    }
-}
-
 impl<T> Grid<T> {
     pub fn iter(&self) -> Vec<(&Pos, &dyn GridChildren<T>)> {
         self.elements
@@ -297,12 +301,14 @@ macro_rules! simple_grid {
 }
 
 #[cfg(test)]
-mod grid_test {
+pub(crate) mod grid_test {
     use sdl2::mouse::MouseButton;
 
     use super::*;
 
-    struct Button {}
+    struct Button {
+        surface: FRect,
+    }
 
     impl GridChildren<usize> for Button {
         fn grid_init(&mut self, _: &mut Canvas<Window>, _: &mut usize) -> Result<(), String> {
@@ -312,9 +318,10 @@ mod grid_test {
         fn grid_init_frame(
             &mut self,
             _: &mut Canvas<Window>,
-            _: FRect,
+            surface: FRect,
             _: &mut usize,
         ) -> Result<(), String> {
+            self.surface = surface;
             Ok(())
         }
 
@@ -325,7 +332,9 @@ mod grid_test {
             counter: &mut usize,
         ) -> Result<(), String> {
             if let Event::MouseButtonDown { .. } = event {
-                *counter += 1;
+                if event.hover(self.surface) {
+                    *counter += 1;
+                }
             }
             Ok(())
         }
@@ -344,9 +353,8 @@ mod grid_test {
         }
     }
 
-    #[test]
     #[allow(clippy::too_many_lines)]
-    fn test_grid_click() {
+    pub(crate) fn test_grid_click(canvas: &mut Canvas<Window>) {
         let mut counter = 0;
         let c = &mut counter;
         let mut grid = simple_grid!(
@@ -375,25 +383,15 @@ mod grid_test {
                     RowType::Px(2.),
                     RowType::Ratio(1.),
                     RowType::Px(2.);
-                    Pos { x: 1, y: 1 } => Button {},
-                    Pos { x: 3, y: 1 } => Button {},
-                    Pos { x: 1, y: 3 } => Button {},
-                    Pos { x: 3, y: 3 } => Button {}
+                    Pos { x: 1, y: 1 } => Button {surface: FRect::new(0., 0., 0., 0.)},
+                    Pos { x: 3, y: 1 } => Button {surface: FRect::new(0., 0., 0., 0.)},
+                    Pos { x: 1, y: 3 } => Button {surface: FRect::new(0., 0., 0., 0.)},
+                    Pos { x: 3, y: 3 } => Button {surface: FRect::new(0., 0., 0., 0.)}
                 ),
-            Pos { x: 3, y: 1 } => Button {},
-            Pos { x: 1, y: 3 } => Button {},
-            Pos { x: 3, y: 3 } => Button {},
+            Pos { x: 3, y: 1 } => Button {surface: FRect::new(0., 0., 0., 0.)},
+            Pos { x: 1, y: 3 } => Button {surface: FRect::new(0., 0., 0., 0.)},
+            Pos { x: 3, y: 3 } => Button {surface: FRect::new(0., 0., 0., 0.)},
         );
-        let sdl = sdl2::init();
-        assert!(sdl.is_ok());
-        let video = sdl.expect("Checked").video();
-        assert!(video.is_ok());
-        let window = video.expect("Checked").window("title", 50, 50).build();
-        assert!(window.is_ok());
-        let window = window.expect("Checked");
-        let mut canvas = window.into_canvas().build();
-        assert!(canvas.is_ok());
-        let canvas = canvas.as_mut().expect("Checked");
         assert!(grid.init(canvas).is_ok());
         assert_eq!(
             grid.init_frame(canvas, FRect::new(0., 0., 50., 50.)),

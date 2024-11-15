@@ -5,6 +5,7 @@ pub mod functions;
 pub mod game_window;
 pub mod grid;
 pub mod missing;
+pub mod panel;
 pub mod ref_element;
 pub mod scroll_view;
 pub mod text_box;
@@ -92,4 +93,26 @@ pub fn run<
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{grid::grid_test::test_grid_click, panel::panel_test::test_panel_click};
+
+    #[test]
+    pub fn tests() {
+        let sdl = sdl2::init();
+        assert!(sdl.is_ok());
+        let video = sdl.expect("Checked").video();
+        assert!(video.is_ok());
+        let window = video.expect("Checked").window("title", 50, 50).build();
+        assert!(window.is_ok());
+        let window = window.expect("Checked");
+        let mut canvas = window.into_canvas().build();
+        assert!(canvas.is_ok());
+        let canvas = canvas.as_mut().expect("Checked");
+
+        test_grid_click(canvas);
+        test_panel_click(canvas);
+    }
 }
