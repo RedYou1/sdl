@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use sdl2::{render::Canvas, video::Window};
 
-use crate::{event::Event, grid::GridChildren};
+use crate::{event::Event, ui_element::grid::GridChildren};
 
 pub struct RefElement<'a, Parent> {
     element: &'a mut dyn GridChildren<Parent>,

@@ -3,7 +3,7 @@ use std::{marker::PhantomData, time::Duration};
 use crate::{
     event::Event,
     functions::{FnColor, FnState, StateEnum},
-    grid::GridChildren,
+    ui_element::grid::GridChildren,
     missing::{
         clipboard::{get_clipboard_text, set_clipboard_text},
         ui_string::UIString,

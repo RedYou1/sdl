@@ -3,13 +3,8 @@ extern crate sdl2;
 pub mod event;
 pub mod functions;
 pub mod game_window;
-pub mod grid;
 pub mod missing;
-pub mod panel;
-pub mod ref_element;
-pub mod scroll_view;
-pub mod text_box;
-pub mod ui_rect;
+pub mod ui_element;
 pub mod user_control;
 
 use std::{thread, time};
@@ -97,7 +92,9 @@ pub fn run<
 
 #[cfg(test)]
 mod tests {
-    use crate::{grid::grid_test::test_grid_click, panel::panel_test::test_panel_click};
+    use crate::ui_element::{
+        grid::grid_test::test_grid_click, panel::panel_test::test_panel_click,
+    };
 
     #[test]
     pub fn tests() {

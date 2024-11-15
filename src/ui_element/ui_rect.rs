@@ -3,8 +3,8 @@ use std::{marker::PhantomData, time::Duration};
 use crate::{
     event::Event,
     functions::{FnAction, FnColor, FnImage, FnState, FnText, StateEnum},
-    grid::GridChildren,
     missing::ui_string::UIString,
+    ui_element::grid::GridChildren,
 };
 use sdl2::{mouse::MouseButton, rect::FRect, render::Canvas, video::Window};
 

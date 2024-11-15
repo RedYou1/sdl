@@ -7,7 +7,7 @@ use sdl2::{
     video::Window,
 };
 
-use crate::{event::Event, functions::FnColor, grid::GridChildren, missing::rect::as_rect};
+use crate::{event::Event, functions::FnColor, ui_element::grid::GridChildren, missing::rect::as_rect};
 
 pub struct ScrollView<Parent, Child: GridChildren<Parent>> {
     parent: PhantomData<Parent>,
