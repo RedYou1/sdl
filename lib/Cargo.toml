@@ -1,6 +1,6 @@
 [package]
 name = "red-sdl"
-version = "0.1.2"
+version = "0.2.0"
 edition = "2021"
 resolver = "2"
 repository = "https://github.com/RedYou1/sdl"
@@ -23,6 +23,8 @@ unwrap_in_result = "warn"
 map_unwrap_or = "warn"
 
 [dependencies]
+red-sdl-macro = "=0.2.0"
+anyhow = "=1.0.95"
 
 [dependencies.sdl2]
 version = "=0.37.0"

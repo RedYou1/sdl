@@ -1,0 +1,31 @@
+[package]
+name = "red-sdl-macro"
+version = "0.2.0"
+edition = "2021"
+resolver = "2"
+repository = "https://github.com/RedYou1/sdl"
+description = "sdl with grid layout and window management to help build apps or video game."
+license = "Apache-2.0"
+categories = ["gui", "graphics"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lints.clippy]
+missing-const-for-fn = "deny"
+unused-enumerate-index = "deny"
+as-underscore = "deny"
+str-to-string = "deny"
+too-many-lines = "deny"
+todo = "warn"
+get-unwrap = "warn"
+unwrap-used = "warn"
+unwrap_in_result = "warn"
+map_unwrap_or = "warn"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "=2.0.98"
+quote = "=1.0.38"
+proc-macro2 = "=1.0.93"

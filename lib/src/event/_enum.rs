@@ -10,6 +10,15 @@ use sdl2::{
 
 #[derive(Debug, Clone)]
 pub enum Event {
+    ElementMove {
+        x: f32,
+        y: f32,
+    },
+    ElementResize {
+        width: f32,
+        height: f32,
+    },
+    //--------------------
     Quit,
     AppTerminating,
     AppLowMemory,
